@@ -3,7 +3,7 @@ import asyncio
 import discord
 from discord.ext.commands import Bot
 from discord.ext import commands
-import re
+import re, json
 
 '''
 by cleary#6546 // @preorderd
@@ -21,7 +21,7 @@ keywords = list(map(str,input("Enter keywords seperated by space: ").split()))
 blacklist = list(map(str,input("Enter blacklisted keywords seperated by space: ").split()))
 
 #enter channel id(s) where links would be picked up (monitor channel id) seperated by commas. these should be ints
-channels = []
+channels = [12345]
 
 #enter token of discord account that has access to watch specified channels
 token = ''
@@ -29,12 +29,14 @@ token = ''
 global start_count
 start_count = 0
 
+browser_path="C:\\Program Files\\Mozilla Firefox\\firefox.exe"
+webbrowser.register('firefox',None,webbrowser.BackgroundBrowser(browser_path))
+
 #check for keywords and blacklisted words in message urls and open browser if conditions are met
 async def check_urls(urls):
     for url in urls:
         if any(x in url.lower() for x in keywords) and all(x not in url.lower() for x in blacklist):
-            #enter path to chrome here, for windows 10, this should work
-            webbrowser.get("C:/Program Files (x86)/Google/Chrome/Application/chrome.exe %s").open(url)
+            webbrowser.get('firefox').open_new_tab(url)
             print(f'Opened {url}')
 
 @client.event
@@ -76,7 +78,6 @@ async def on_message(message):
                         except:
                             pass
             if message.content != '':
-                print(message.content)
                 urls4 = re.findall("(?:(?:https?|ftp):\/\/|\b(?:[a-z\d]+\.))(?:(?:[^\s()<>]+|\((?:[^\s()<>]+|(?:\([^\s()<>]+\)))?\))+(?:\((?:[^\s()<>]+|(?:\(?:[^\s()<>]+\)))?\)|[^\s`!()\[\]{};:'.,<>?«»“”‘’]))?",message.content)
                 if urls4:
                     await check_urls(urls4)
